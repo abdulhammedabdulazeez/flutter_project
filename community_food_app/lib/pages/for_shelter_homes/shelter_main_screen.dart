@@ -35,7 +35,9 @@ class _ShelterMainScreenState extends State<ShelterMainScreen> {
               itemBuilder: (context, index) {
                 final categoryItem = categories[index];
                 return InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pushNamed(context, '/available_foods_page');
+                  },
                   child: Card(
                     elevation: 10,
                     shape: RoundedRectangleBorder(

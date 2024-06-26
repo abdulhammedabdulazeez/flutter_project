@@ -67,11 +67,15 @@ class _ShelterHomeWrapperState extends State<ShelterHomeWrapper> {
               ),
               actions: [
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/notification_page');
+                  },
                   icon: const Icon(Icons.notifications_none_outlined),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/location_filter_page');
+                  },
                   icon: const Icon(Icons.tune_outlined),
                 ),
               ],

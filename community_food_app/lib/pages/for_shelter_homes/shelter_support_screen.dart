@@ -24,22 +24,60 @@ class _ShelterSupportScreenState extends State<ShelterSupportScreen> {
     return SafeArea(
       child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.fromLTRB(16, 25, 16, 16),
           child: Column(
             children: [
               const Text(
                 'Send us a message',
                 style: TextStyle(
-                  fontSize: 30,
+                  fontSize: 25,
                   color: Color.fromARGB(255, 3, 71, 50),
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 50),
               Form(
                 key: _formGlobalKey,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    InputField(
+                      label: 'Shelter Name',
+                      validation: _inputValidator,
+                    ),
+                    const SizedBox(height: 30),
+                    InputField(
+                      label: 'Recent order from',
+                      validation: _inputValidator,
+                    ),
+                    const SizedBox(height: 30),
+                    Material(
+                      elevation: 10,
+                      shadowColor: Colors.black45,
+                      borderRadius: BorderRadius.circular(10),
+                      type: MaterialType.card,
+                      child: SizedBox(
+                        height: 200,
+                        child: TextFormField(
+                          maxLines: null,
+                          // expands: true,
+                          decoration: const InputDecoration(
+                            hintText: 'Write your message...',
+                            hintStyle: TextStyle(color: Colors.grey),
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 12),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30)),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          validator: _inputValidator,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 60),
                     ButtonComponent(
                       text: 'Submit',
                       onTap: () {
