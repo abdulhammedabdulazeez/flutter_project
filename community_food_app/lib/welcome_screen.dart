@@ -54,6 +54,39 @@ class WelcomeScreen extends StatelessWidget {
                   },
                   textColor: 'white',
                 ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Already a user?',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/shelter_login_page');
+                      },
+                      child: Text(
+                        'Login',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            shadows: [
+                              Shadow(
+                                  color: Colors.black.withOpacity(0.7),
+                                  offset: const Offset(2, 3),
+                                  blurRadius: 8)
+                            ]),
+                      ),
+                    ),
+                  ],
+                )
               ],
             ),
           ),

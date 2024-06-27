@@ -2,14 +2,14 @@ import 'package:community_food_app/button_component.dart';
 import 'package:community_food_app/input_field_component.dart';
 import 'package:flutter/material.dart';
 
-class ShelterSignupScreen extends StatefulWidget {
-  const ShelterSignupScreen({super.key});
+class ShelterLoginPage extends StatefulWidget {
+  const ShelterLoginPage({super.key});
 
   @override
-  State<ShelterSignupScreen> createState() => _SignupScreenState();
+  State<ShelterLoginPage> createState() => _ShelterLoginPageState();
 }
 
-class _SignupScreenState extends State<ShelterSignupScreen> {
+class _ShelterLoginPageState extends State<ShelterLoginPage> {
   final _formGlobalKey = GlobalKey<FormState>();
 
   String? _passwordValidator(String? value) {
@@ -26,20 +26,13 @@ class _SignupScreenState extends State<ShelterSignupScreen> {
     return null;
   }
 
-  String? _nameValidator(String? value) {
-    if (value == null || value.isEmpty || value.length < 2) {
-      return 'You must enter your name';
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 100,
         title: const Text(
-          'Sign Up',
+          'Log in',
           style: TextStyle(
             fontSize: 30,
             fontWeight: FontWeight.bold,
@@ -62,13 +55,6 @@ class _SignupScreenState extends State<ShelterSignupScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                //NAME FIELD
-
-                InputField(
-                  label: 'Shelter Name',
-                  validation: _nameValidator,
-                ),
-
                 const SizedBox(height: 30),
 
                 //EMAIL FIELD
@@ -85,6 +71,19 @@ class _SignupScreenState extends State<ShelterSignupScreen> {
                 InputField(
                   label: 'Password',
                   validation: _passwordValidator,
+                ),
+
+                const SizedBox(height: 20),
+
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Forgot password?',
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 94, 240, 150),
+                      fontSize: 16,
+                    ),
+                  ),
                 ),
 
                 const SizedBox(height: 100),
