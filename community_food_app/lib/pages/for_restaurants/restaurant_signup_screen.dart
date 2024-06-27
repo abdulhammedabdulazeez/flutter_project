@@ -92,8 +92,10 @@ class _RestaurantSignupScreenState extends State<RestaurantSignupScreen> {
                 ButtonComponent(
                   text: 'Login',
                   onTap: () {
-                    _formGlobalKey.currentState!.validate();
-                    // _formGlobalKey.currentState!.reset();
+                    if (_formGlobalKey.currentState!.validate()) {
+                      Navigator.pushNamed(context, '/restaurant_main_page');
+                      _formGlobalKey.currentState!.reset();
+                    }
                   },
                   textColor: 'black',
                 ),
