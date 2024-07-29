@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class FoodCard extends StatefulWidget {
   const FoodCard({
     super.key,
     required this.imgPath,
     required this.dishName,
+    required this.restaurant,
     required this.description,
     required this.attachment,
   });
 
   final String imgPath;
   final String dishName;
+  final String restaurant;
   final String description;
   final Widget attachment;
 
@@ -32,10 +35,11 @@ class _FoodCardState extends State<FoodCard> {
           children: [
             Row(
               children: [
-                Image.asset(
-                  widget.imgPath,
+                FadeInImage(
+                  placeholder: MemoryImage(kTransparentImage),
+                  image: NetworkImage(widget.imgPath),
                   width: 80,
-                  // height: 80,
+                    // height: 80,
                   fit: BoxFit.cover,
                 ),
                 const SizedBox(width: 20),
@@ -49,6 +53,16 @@ class _FoodCardState extends State<FoodCard> {
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
                         ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        'By: ${widget.restaurant}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 5),
                       Text(

@@ -1,57 +1,32 @@
 import 'package:community_food_app/button_component.dart';
 import 'package:community_food_app/food_card.dart';
+import 'package:community_food_app/models/food.dart';
+import 'package:community_food_app/providers/add_to_bag_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AvailableFoods extends StatefulWidget {
-  const AvailableFoods({super.key});
+class AvailableFoods extends ConsumerStatefulWidget {
+  const AvailableFoods(
+      {super.key, required this.foodItems, required this.title});
+
+  final List<Food> foodItems;
+  final String title;
 
   @override
-  State<AvailableFoods> createState() => _AvailableFoodsState();
+  ConsumerState<AvailableFoods> createState() => _AvailableFoodsState();
 }
 
-class _AvailableFoodsState extends State<AvailableFoods> {
-  final List<Map<String, dynamic>> foodItems = [
-    {
-      'imagePath': 'assets/images/Leafy green salad.png',
-      'name': 'Leafy Green Salad',
-      'desp':
-          'Pams baby spinach, galaxy creamy feta, pams strawberries, sliced almonds, blue cheese',
-      'selected': false,
-    },
-    {
-      'imagePath': 'assets/images/image salad.png',
-      'name': 'Bound Salad',
-      'desp': 'Avocado, corn, pepperjack, crispy shallots, romaine',
-      'selected': false,
-    },
-    {
-      'imagePath': 'assets/images/Garden salad.png',
-      'name': 'Garden Salad',
-      'desp': 'Chopt lettuce blend, blue cheese, grape tomatoes, romaine',
-      'selected': false,
-    },
-    {
-      'imagePath': 'assets/images/fattoush.png',
-      'name': 'Fattoush',
-      'desp': 'Gluten-sensitive noodle stir-fry with shrimp, egg, citrus, peanuts, green onions.',
-      'selected': false,
-    },
-  ];
 
-  void onClick(int index) {
-    setState(() {
-      foodItems[index]['selected'] = !foodItems[index]['selected'];
-    });
-  }
-
+class _AvailableFoodsState extends ConsumerState<AvailableFoods> {
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 100,
-        title: const Text(
-          'List of Available foods',
-          style: TextStyle(
+        title: Text(
+          widget.title,
+          style: const TextStyle(
             fontSize: 25,
             color: Color.fromARGB(255, 3, 71, 50),
           ),
@@ -63,23 +38,27 @@ class _AvailableFoodsState extends State<AvailableFoods> {
           children: [
             const SizedBox(height: 20),
             Column(
-              children: foodItems.asMap().entries.map((entry) {
-                int index = entry.key;
-                Map<String, dynamic> foodItem = entry.value;
+              children: widget.foodItems.asMap().entries.map((entry) {
+                // int index = entry.key;
+                Food foodItem = entry.value;
+
+                final addedToBag = ref.watch(addToBagProvider);
+                final isAdded = addedToBag.contains(foodItem);
 
                 return FoodCard(
-                  imgPath: foodItem['imagePath'],
-                  dishName: foodItem['name'],
-                  description: foodItem['desp'],
+                  imgPath: foodItem.imageUrl,
+                  dishName: foodItem.title,
+                  restaurant: foodItem.restaurantName,
+                  description: foodItem.ingredients.toString(),
                   attachment: Row(
                     children: [
                       IconButton(
-                        onPressed: () => onClick(index),
-                        icon: !foodItem['selected']
-                            ? const Icon(
-                                Icons.add_box_outlined,
-                              )
-                            : const Icon(Icons.check_box_outlined),
+                        onPressed: () {
+                          ref
+                              .read(addToBagProvider.notifier)
+                              .toggleAddToBag(foodItem);
+                        },
+                        icon: Icon(isAdded ? Icons.check_box_outlined: Icons.add_box_outlined),
                         color: const Color.fromARGB(255, 3, 71, 50),
                       )
                     ],

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "414643737187",
+    "project_id": "community-food-app",
+    "storage_bucket": "community-food-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414643737187:android:e8a1a6893ad5b80f299e56",
+        "android_client_info": {
+          "package_name": "com.example.community_food_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIQQgdqA__1Msej0q52TuJ8fal_t8qN6M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

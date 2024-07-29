@@ -1,6 +1,7 @@
 import 'package:community_food_app/pages/for_shelter_homes/shelter_cart_screen.dart';
 import 'package:community_food_app/pages/for_shelter_homes/shelter_main_screen.dart';
 import 'package:community_food_app/pages/for_shelter_homes/shelter_support_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ShelterHomeWrapper extends StatefulWidget {
@@ -77,6 +78,13 @@ class _ShelterHomeWrapperState extends State<ShelterHomeWrapper> {
                     Navigator.pushNamed(context, '/location_filter_page');
                   },
                   icon: const Icon(Icons.tune_outlined),
+                ),
+                IconButton(
+                  onPressed: () {
+                    FirebaseAuth.instance.signOut();
+                    Navigator.pushNamed(context, '/shelter_login_page');
+                  },
+                  icon: const Icon(Icons.no_accounts),
                 ),
               ],
             )

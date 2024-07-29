@@ -1,47 +1,29 @@
 import 'package:community_food_app/button_component.dart';
 import 'package:community_food_app/food_card.dart';
+import 'package:community_food_app/models/food.dart';
+import 'package:community_food_app/pages/for_shelter_homes/shelter_checkout_screen.dart';
+import 'package:community_food_app/providers/add_to_bag_provider.dart';
+import 'package:community_food_app/providers/item_count_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ShelterCartScreen extends StatefulWidget {
+class ShelterCartScreen extends ConsumerStatefulWidget {
   const ShelterCartScreen({super.key});
 
+  // final List<Food> foodItems;
+
   @override
-  State<ShelterCartScreen> createState() => _ShelterCartScreenState();
+  ConsumerState<ShelterCartScreen> createState() => _ShelterCartScreenState();
 }
 
-class _ShelterCartScreenState extends State<ShelterCartScreen> {
-  final List<Map<String, dynamic>> foodItems = [
-    {
-      'imagePath': 'assets/images/Leafy green salad.png',
-      'name': 'Leafy Green Salad',
-      'desp':
-          'Pams baby spinach, galaxy creamy feta, pams strawberries, sliced almonds, blue cheese',
-      'itemCount': 1,
-    },
-    {
-      'imagePath': 'assets/images/image salad.png',
-      'name': 'Bound Salad',
-      'desp': 'Avocado, corn, pepperjack, crispy shallots, romaine',
-      'itemCount': 1,
-    },
-  ];
-
-  void incrementItemCount(int index) {
-    setState(() {
-      foodItems[index]['itemCount']++;
-    });
-  }
-
-  void decrementItemCount(int index) {
-    setState(() {
-      if (foodItems[index]['itemCount'] > 1) {
-        foodItems[index]['itemCount']--;
-      }
-    });
-  }
+class _ShelterCartScreenState extends ConsumerState<ShelterCartScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    final foodItems = ref.watch(addToBagProvider);
+    final foodCount = ref.watch(foodCountProvider);
+
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
@@ -66,22 +48,27 @@ class _ShelterCartScreenState extends State<ShelterCartScreen> {
             Column(
               children: foodItems.asMap().entries.map((entry) {
                 int index = entry.key;
-                Map<String, dynamic> foodItem = entry.value;
+                Food foodItem = entry.value;
 
                 return FoodCard(
-                  imgPath: foodItem['imagePath'],
-                  dishName: foodItem['name'],
-                  description: foodItem['desp'],
+                  imgPath: foodItem.imageUrl,
+                  dishName: foodItem.title,
+                  restaurant: foodItem.restaurantName,
+                  description: foodItem.ingredients.toString(),
                   attachment: Row(
                     children: [
                       const Text('Qty:'),
                       IconButton(
-                        onPressed: () => incrementItemCount(index),
+                        onPressed: () {
+                          ref.read(foodCountProvider.notifier).incrementItemCount(index);
+                        },
                         icon: const Icon(Icons.add),
                       ),
-                      Text(foodItem['itemCount'].toString()),
+                      Text(foodCount[index].count.toString()),
                       IconButton(
-                        onPressed: () => decrementItemCount(index),
+                        onPressed: () {
+                          ref.read(foodCountProvider.notifier).decrementItemCount(index);
+                        },
                         icon: const Icon(Icons.remove),
                       ),
                     ],
@@ -91,8 +78,12 @@ class _ShelterCartScreenState extends State<ShelterCartScreen> {
             ),
             const SizedBox(height: 20),
             ButtonComponent(
-              text: 'Done!',
-              onTap: () {},
+              text: 'Checkout',
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (ctx) => const ShelterCheckoutScreen())
+                );
+              },
               textColor: 'black',
             ),
           ],

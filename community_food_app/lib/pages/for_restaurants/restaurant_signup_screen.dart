@@ -1,4 +1,7 @@
+import 'package:community_food_app/auth/firebase_auth_implementation/firebase_auth_services.dart';
 import 'package:community_food_app/input_field_component.dart';
+import 'package:community_food_app/toast.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:community_food_app/button_component.dart';
 
@@ -11,6 +14,12 @@ class RestaurantSignupScreen extends StatefulWidget {
 
 class _RestaurantSignupScreenState extends State<RestaurantSignupScreen> {
   final _formGlobalKey = GlobalKey<FormState>();
+
+  final FirebaseAuthService _auth = FirebaseAuthService();
+
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   String? _passwordValidator(String? value) {
     if (value == null || value.isEmpty || value.length < 5) {
@@ -31,6 +40,29 @@ class _RestaurantSignupScreenState extends State<RestaurantSignupScreen> {
       return 'You must enter your name';
     }
     return null;
+  }
+
+  @override
+  void dispose() {
+    // Dispose controllers when the widget is disposed
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _signUp() async {
+    // String shelterName = _nameController.text;
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    User? user = await _auth.signUpWithEmailAndPassword(email, password);
+
+    if (user != null && mounted && _formGlobalKey.currentState!.validate()) {
+      showToast(message: 'User is successfully created');
+      _formGlobalKey.currentState!.reset();
+      Navigator.pushNamed(context, '/shelter_main_page');
+    } 
   }
 
   @override
@@ -66,6 +98,7 @@ class _RestaurantSignupScreenState extends State<RestaurantSignupScreen> {
                 InputField(
                   label: 'Restaurant Name',
                   validation: _nameValidator,
+                  controller: _nameController,
                 ),
 
                 const SizedBox(height: 30),
@@ -75,6 +108,7 @@ class _RestaurantSignupScreenState extends State<RestaurantSignupScreen> {
                 InputField(
                   label: 'Email Address',
                   validation: _emailValidator,
+                  controller: _emailController,
                 ),
 
                 const SizedBox(height: 30),
@@ -84,6 +118,7 @@ class _RestaurantSignupScreenState extends State<RestaurantSignupScreen> {
                 InputField(
                   label: 'Password',
                   validation: _passwordValidator,
+                  controller: _passwordController,
                 ),
 
                 const SizedBox(height: 100),
@@ -91,10 +126,7 @@ class _RestaurantSignupScreenState extends State<RestaurantSignupScreen> {
                 // LOGIN BUTTON
                 ButtonComponent(
                   text: 'Login',
-                  onTap: () {
-                    _formGlobalKey.currentState!.validate();
-                    // _formGlobalKey.currentState!.reset();
-                  },
+                  onTap: _signUp,
                   textColor: 'black',
                 ),
               ],

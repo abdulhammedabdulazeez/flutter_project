@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:community_food_app/models/category_list_data.dart';
+import 'package:community_food_app/models/dummy_data.dart';
+import 'package:community_food_app/pages/for_shelter_homes/shelter_available_foods.dart';
+import 'package:flutter/material.dart';
 
 class ShelterMainScreen extends StatefulWidget {
   const ShelterMainScreen({super.key});
@@ -9,6 +11,22 @@ class ShelterMainScreen extends StatefulWidget {
 }
 
 class _ShelterMainScreenState extends State<ShelterMainScreen> {
+  void onSelectCategory(BuildContext context, CategoryItem category) {
+    final filteredFood = dummyMeals
+        .where((item) => item.categories.contains(category.label.toLowerCase()))
+        .toList();
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => AvailableFoods(
+          foodItems: filteredFood,
+          title: category.label,
+        ),
+      ),
+    );
+    // print(filteredFood);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -36,7 +54,7 @@ class _ShelterMainScreenState extends State<ShelterMainScreen> {
                 final categoryItem = categories[index];
                 return InkWell(
                   onTap: () {
-                    Navigator.pushNamed(context, '/available_foods_page');
+                    onSelectCategory(context, categoryItem);
                   },
                   child: Card(
                     elevation: 10,

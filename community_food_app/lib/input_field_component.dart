@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 class InputField extends StatelessWidget {
-  const InputField({super.key, required this.label, required this.validation});
+  const InputField({super.key, required this.label, required this.validation, required this.controller,});
 
   final String? Function(String?)? validation;
   final String label;
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +26,7 @@ class InputField extends StatelessWidget {
           borderRadius: BorderRadius.circular(50),
           type: MaterialType.card,
           child: TextFormField(
+            controller: controller,
             decoration: const InputDecoration(
               filled: true,
               fillColor: Colors.white,

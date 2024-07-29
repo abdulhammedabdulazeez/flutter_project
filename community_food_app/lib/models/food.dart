@@ -1,8 +1,17 @@
-
-enum Category {vegetables, fruits, seafoods, snacks}
-
 class Food {
-  Food({required this.category});
+  Food({
+    required this.categories,
+    required this.id,
+    required this.imageUrl,
+    required this.ingredients,
+    required this.title,
+    required this.restaurantName
+  });
 
-  final Category category;
+  final String id;
+  final String title;
+  final List<String> categories;
+  final String imageUrl;
+  final List<String> ingredients;
+  final String restaurantName;
 }

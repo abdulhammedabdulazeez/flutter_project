@@ -12,11 +12,22 @@ class ShelterSupportScreen extends StatefulWidget {
 class _ShelterSupportScreenState extends State<ShelterSupportScreen> {
   final _formGlobalKey = GlobalKey<FormState>();
 
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
+
   String? _inputValidator(String? value) {
     if (value == null || value.isEmpty || value.length < 2) {
       return 'Input can not be empty';
     }
     return null;
+  }
+
+  @override
+  void dispose() {
+    // Dispose controllers when the widget is disposed
+    _messageController.dispose();
+    _nameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -43,11 +54,13 @@ class _ShelterSupportScreenState extends State<ShelterSupportScreen> {
                     InputField(
                       label: 'Shelter Name',
                       validation: _inputValidator,
+                      controller: _nameController,
                     ),
                     const SizedBox(height: 30),
                     InputField(
                       label: 'Recent order from',
                       validation: _inputValidator,
+                      controller: _messageController,
                     ),
                     const SizedBox(height: 30),
                     Material(

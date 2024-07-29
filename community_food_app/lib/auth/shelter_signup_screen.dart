@@ -1,6 +1,9 @@
 import 'package:community_food_app/button_component.dart';
 import 'package:community_food_app/input_field_component.dart';
+import 'package:community_food_app/toast.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:community_food_app/auth/firebase_auth_implementation/firebase_auth_services.dart';
 
 class ShelterSignupScreen extends StatefulWidget {
   const ShelterSignupScreen({super.key});
@@ -11,6 +14,12 @@ class ShelterSignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<ShelterSignupScreen> {
   final _formGlobalKey = GlobalKey<FormState>();
+
+  final FirebaseAuthService _auth = FirebaseAuthService();
+
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   String? _passwordValidator(String? value) {
     if (value == null || value.isEmpty || value.length < 5) {
@@ -31,6 +40,29 @@ class _SignupScreenState extends State<ShelterSignupScreen> {
       return 'You must enter your name';
     }
     return null;
+  }
+
+  @override
+  void dispose() {
+    // Dispose controllers when the widget is disposed
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _signUp() async {
+    // String shelterName = _nameController.text;
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    User? user = await _auth.signUpWithEmailAndPassword(email, password);
+
+    if (user != null && mounted && _formGlobalKey.currentState!.validate()) {
+      showToast(message: 'User is successfully created');
+      _formGlobalKey.currentState!.reset();
+      Navigator.pushNamed(context, '/shelter_main_page');
+    } 
   }
 
   @override
@@ -67,6 +99,7 @@ class _SignupScreenState extends State<ShelterSignupScreen> {
                 InputField(
                   label: 'Shelter Name',
                   validation: _nameValidator,
+                  controller: _nameController,
                 ),
 
                 const SizedBox(height: 30),
@@ -76,6 +109,7 @@ class _SignupScreenState extends State<ShelterSignupScreen> {
                 InputField(
                   label: 'Email Address',
                   validation: _emailValidator,
+                  controller: _emailController,
                 ),
 
                 const SizedBox(height: 30),
@@ -85,19 +119,15 @@ class _SignupScreenState extends State<ShelterSignupScreen> {
                 InputField(
                   label: 'Password',
                   validation: _passwordValidator,
+                  controller: _passwordController,
                 ),
 
                 const SizedBox(height: 100),
 
                 // LOGIN BUTTON
                 ButtonComponent(
-                  text: 'Login',
-                  onTap: () {
-                    if (_formGlobalKey.currentState!.validate()) {
-                      Navigator.pushNamed(context, '/shelter_main_page');
-                      _formGlobalKey.currentState!.reset();
-                    }
-                  },
+                  text: 'Sign Up!',
+                  onTap: _signUp,
                   textColor: 'black',
                 ),
               ],
@@ -108,3 +138,9 @@ class _SignupScreenState extends State<ShelterSignupScreen> {
     );
   }
 }
+// () {
+//                     if (_formGlobalKey.currentState!.validate()) {
+//                       _signUp();
+//                       _formGlobalKey.currentState!.reset();
+//                     }
+//                   },
