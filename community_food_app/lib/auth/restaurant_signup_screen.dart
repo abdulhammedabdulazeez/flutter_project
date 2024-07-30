@@ -61,7 +61,7 @@ class _RestaurantSignupScreenState extends State<RestaurantSignupScreen> {
     if (user != null && mounted && _formGlobalKey.currentState!.validate()) {
       showToast(message: 'User is successfully created');
       _formGlobalKey.currentState!.reset();
-      Navigator.pushNamed(context, '/shelter_main_page');
+      Navigator.pushNamed(context, '/restaurant_main_page');
     } 
   }
 
