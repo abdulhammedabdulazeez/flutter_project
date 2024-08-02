@@ -2,7 +2,6 @@ import 'package:community_food_app/firebase_options.dart';
 import 'package:community_food_app/pages/for_restaurants/restaurant_home_wrapper.dart';
 import 'package:community_food_app/pages/for_restaurants/restaurant_location_filter.dart';
 import 'package:community_food_app/pages/for_restaurants/restaurant_notification_screen.dart';
-import 'package:community_food_app/pages/for_restaurants/restaurant_previous_meals.dart';
 import 'package:community_food_app/auth/restaurant_signup_screen.dart';
 import 'package:community_food_app/pages/for_shelter_homes/shelter_home_wrapper.dart';
 import 'package:community_food_app/pages/for_shelter_homes/shelter_location_filter.dart';
@@ -42,7 +41,6 @@ Future<void> main() async {
           '/restaurant_main_page':(context) => const RestaurantHomeWrapper(),
           '/restaurant_notification_page':(context) => const RestaurantNotificatioScreen(),
           '/restaurant_filter_page':(context) => const RestaurantLocationFilter(),
-          '/restaurant_previous_meal_page':(context) => const RestarantPreviousMeal(),
         },
       ),
     ),

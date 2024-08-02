@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:community_food_app/auth/firebase_auth_implementation/firebase_auth_services.dart';
 import 'package:community_food_app/button_component.dart';
 import 'package:community_food_app/input_field_component.dart';
@@ -51,10 +52,37 @@ class _ShelterLoginPageState extends State<ShelterLoginPage> {
 
     User? user = await _auth.signInWithEmailAndPassword(email, password);
 
-    if (user != null && mounted && _formGlobalKey.currentState!.validate()) {
+    // if (user != null && mounted && _formGlobalKey.currentState!.validate()) {
+    //   final userRole = FirebaseFirestore.instance.collection("users");
+    //   showToast(message: 'Welcome Back!');
+    //   _formGlobalKey.currentState!.reset();
+    //   if (userRole.doc) {
+        
+    //   }
+    // }
+
+
+    if (user != null && _formGlobalKey.currentState!.validate()) {
+      // Fetch user role from Firestore
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection("users").doc(user.uid).get();
+      
+      if (userDoc.exists) {
+        String userRole = userDoc.get("role"); // Assuming role is stored in the document
+
+        // Navigate based on user role
+        if (userRole == "Shelter" && mounted) {
+          Navigator.pushNamed(context, '/shelter_main_page');
+        } else if (userRole == "Restaurant" && mounted) {
+          Navigator.pushNamed(context, '/restaurant_main_page');
+        } else {
+          showToast(message: 'Unknown user role');
+        }
+      } else {
+        showToast(message: 'User data not found');
+      }
+
       showToast(message: 'Welcome Back!');
       _formGlobalKey.currentState!.reset();
-      Navigator.pushNamed(context, '/shelter_main_page');
     }
   }
 
@@ -77,10 +105,10 @@ class _ShelterLoginPageState extends State<ShelterLoginPage> {
         if (mounted) {
           Navigator.pushNamed(context, '/shelter_main_page');
         }
+
       }
     } catch (e) {
       showToast(message: 'Some error occured: $e');
-      print('Some error occured: $e');
     }
   }
 

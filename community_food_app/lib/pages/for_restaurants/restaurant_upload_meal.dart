@@ -1,5 +1,10 @@
 import 'dart:io';
 
+import 'package:community_food_app/auth/firebase_auth_implementation/firebase_storage_services.dart';
+import 'package:community_food_app/models/category_list_data.dart';
+import 'package:community_food_app/models/dummy_data.dart';
+import 'package:community_food_app/models/food.dart';
+import 'package:community_food_app/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -15,9 +20,14 @@ class _RestaurantUploadMealState extends State<RestaurantUploadMeal> {
   TimeOfDay? _startTime;
   TimeOfDay? _endTime;
 
-  TextEditingController nameController = TextEditingController();
+  StorageService storage = StorageService();
+
+  String? _selectedRestaurant;
+  CategoryItem? _selectedCategory;
+
+  TextEditingController mealController = TextEditingController();
   TextEditingController ingrdientsController = TextEditingController();
-   
+  TextEditingController idController = TextEditingController();
 
   File? selectedImage;
 
@@ -49,8 +59,9 @@ class _RestaurantUploadMealState extends State<RestaurantUploadMeal> {
 
   @override
   void dispose() {
-    nameController.dispose();
+    mealController.dispose();
     ingrdientsController.dispose();
+    idController.dispose();
     super.dispose();
   }
 
@@ -70,13 +81,49 @@ class _RestaurantUploadMealState extends State<RestaurantUploadMeal> {
     }
   }
 
+
   Future uploadImage() async {
     final uploadedImage =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (uploadedImage != null) {
       setState(() {
         selectedImage = File(uploadedImage.path);
+        showToast(message: 'Image uploaded');
       });
+    }
+    // print(await storage.uploadImageAndGetUrl(selectedImage!));
+  }
+
+  void _onClickUpload() async {
+    if (_selectedRestaurant != null &&
+        _selectedCategory != null &&
+        mealController.text.isNotEmpty &&
+        ingrdientsController.text.isNotEmpty &&
+        selectedImage != null) {
+
+      final imageUrl = await storage.uploadImageAndGetUrl(selectedImage!);
+
+      final newFood = Food(
+        id: '',
+        title: mealController.text,
+        categories: [_selectedCategory!.label],
+        catagory: _selectedCategory!.label,
+        imageUrl: imageUrl,
+        ingredients: ingrdientsController.text.split(',').toList(),
+        restaurantName: _selectedRestaurant!,
+      );
+
+      // Save to Firestore
+      await storage.uploadMeal(newFood);
+      await storage.uploadMealToAggregation(newFood);
+
+      // Navigate back or update UI
+      if (mounted) {
+        showToast(message: 'Meal uploaded successfully');
+        Navigator.pop(context);
+      }
+    } else {
+      showToast(message: 'Please fill out all fields.');
     }
   }
 
@@ -98,31 +145,23 @@ class _RestaurantUploadMealState extends State<RestaurantUploadMeal> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Shelter Name',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: Color.fromARGB(255, 3, 71, 50),
-              ),
-            ),
-            const SizedBox(height: 8),
             TextFormField(
-              controller: nameController,
+              controller: mealController,
               decoration: const InputDecoration(
+                hintText: 'Meal Name',
                 filled: false,
                 // fillColor: Colors.white,
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(50)),
+                border: UnderlineInputBorder(
+                  // borderRadius: BorderRadius.all(Radius.circular(50)),
                   borderSide: BorderSide(
                     color: Color.fromARGB(255, 3, 71, 50),
                     width: 1,
                   ),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(50)),
+                focusedBorder: UnderlineInputBorder(
+                  // borderRadius: BorderRadius.all(Radius.circular(50)),
                   borderSide: BorderSide(
                     color: Color.fromARGB(255, 3, 71, 50),
                     width: 1,
@@ -130,32 +169,24 @@ class _RestaurantUploadMealState extends State<RestaurantUploadMeal> {
                 ),
               ),
             ),
-            const SizedBox(height: 25),
-            const Text(
-              'Ingredients:',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: Color.fromARGB(255, 3, 71, 50),
-              ),
-            ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 20),
             TextFormField(
               controller: ingrdientsController,
               decoration: const InputDecoration(
                 filled: false,
+                hintText: 'Ingredients',
                 // fillColor: Colors.white,
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                border: UnderlineInputBorder(
+                  // borderRadius: BorderRadius.all(Radius.circular(10)),
                   borderSide: BorderSide(
                     color: Color.fromARGB(255, 3, 71, 50),
                     width: 1,
                   ),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                focusedBorder: UnderlineInputBorder(
+                  // borderRadius: BorderRadius.all(Radius.circular(10)),
                   borderSide: BorderSide(
                     color: Color.fromARGB(255, 3, 71, 50),
                     width: 1,
@@ -163,7 +194,57 @@ class _RestaurantUploadMealState extends State<RestaurantUploadMeal> {
                 ),
               ),
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 20),
+            DropdownButtonFormField<String>(
+              value: _selectedRestaurant,
+              hint: const Text('Select Your Restaurant'),
+              items: restaurants.map((String restaurant) {
+                return DropdownMenuItem<String>(
+                  value: restaurant,
+                  child: Text(
+                    restaurant,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedRestaurant = value;
+                });
+              },
+              validator: (value) =>
+                  value == null ? 'Please select a restaurant' : null,
+              decoration: const InputDecoration(
+                focusedBorder: UnderlineInputBorder(
+                  // borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 3, 71, 50),
+                    width: 1,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            DropdownButtonFormField<CategoryItem>(
+              value: _selectedCategory,
+              hint: const Text('Select meal category'),
+              items: categories.map((category) {
+                return DropdownMenuItem<CategoryItem>(
+                  value: category,
+                  child: Text(
+                    category.label,
+                  ),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedCategory = value;
+                });
+              },
+              validator: (value) =>
+                  value == null ? 'Please select a category' : null,
+            ),
+            const SizedBox(height: 30),
             const Text(
               'Food Image',
               style: TextStyle(
@@ -213,7 +294,7 @@ class _RestaurantUploadMealState extends State<RestaurantUploadMeal> {
                 )
               ],
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 30),
             Row(
               children: [
                 const Text(
@@ -224,15 +305,15 @@ class _RestaurantUploadMealState extends State<RestaurantUploadMeal> {
                     color: Colors.black,
                   ),
                 ),
-                const SizedBox(width: 50),
+                // const SizedBox(width: 5),
                 IconButton(
-                  onPressed: addQuantity,
+                  onPressed: subtractQuantity,
                   icon: const Icon(
-                    Icons.add_circle,
+                    Icons.remove_circle,
                     size: 30,
                   ),
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: 10),
                 Text(
                   foodQuantity.toString(),
                   style: const TextStyle(
@@ -241,14 +322,42 @@ class _RestaurantUploadMealState extends State<RestaurantUploadMeal> {
                     color: Colors.black,
                   ),
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: 10),
                 IconButton(
-                  onPressed: subtractQuantity,
+                  onPressed: addQuantity,
                   icon: const Icon(
-                    Icons.remove_circle,
+                    Icons.add_circle,
                     size: 30,
                   ),
                 ),
+                
+                // ConstrainedBox(
+                //   constraints: const BoxConstraints(maxWidth: 150),
+                //   child: TextFormField(
+                //     controller: idController,
+                //     decoration: const InputDecoration(
+                //       filled: false,
+                //       hintText: 'Input Id',
+                //       // fillColor: Colors.white,
+                //       contentPadding:
+                //           EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                //       border: OutlineInputBorder(
+                //         borderRadius: BorderRadius.all(Radius.circular(10)),
+                //         borderSide: BorderSide(
+                //           color: Color.fromARGB(255, 3, 71, 50),
+                //           width: 1,
+                //         ),
+                //       ),
+                //       focusedBorder: OutlineInputBorder(
+                //         borderRadius: BorderRadius.all(Radius.circular(10)),
+                //         borderSide: BorderSide(
+                //           color: Color.fromARGB(255, 3, 71, 50),
+                //           width: 1,
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // )
               ],
             ),
             const SizedBox(height: 30),
@@ -292,7 +401,7 @@ class _RestaurantUploadMealState extends State<RestaurantUploadMeal> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              onPressed: () {},
+              onPressed: _onClickUpload,
               child: const Text(
                 'Upload',
                 style: TextStyle(
@@ -306,4 +415,5 @@ class _RestaurantUploadMealState extends State<RestaurantUploadMeal> {
       ),
     );
   }
+
 }

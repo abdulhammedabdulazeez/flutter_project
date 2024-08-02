@@ -1,47 +1,22 @@
 import 'package:community_food_app/food_card.dart';
+import 'package:community_food_app/models/food.dart';
 import 'package:community_food_app/pages/for_restaurants/restaurant_upload_meal.dart';
 import 'package:flutter/material.dart';
 
 class RestarantPreviousMeal extends StatefulWidget {
-  const RestarantPreviousMeal({super.key});
+  const RestarantPreviousMeal({super.key, required this.foodItems});
+
+  final List<Food> foodItems;
 
   @override
   State<RestarantPreviousMeal> createState() => _RestarantPreviousMealState();
 }
 
 class _RestarantPreviousMealState extends State<RestarantPreviousMeal> {
-  final List<Map<String, dynamic>> foodItems = [
-    {
-      'imagePath': 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Grilled_salmon.jpg',
-      'name': 'Leafy Green Salad',
-      'desp':
-          'Pams baby spinach, galaxy creamy feta, pams strawberries, sliced almonds, blue cheese',
-      'selected': false,
-    },
-    {
-      'imagePath': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Stir_Fried_Watercress.jpg/2560px-Stir_Fried_Watercress.jpg?20190131173852',
-      'name': 'Bound Salad',
-      'desp': 'Avocado, corn, pepperjack, crispy shallots, romaine',
-      'selected': false,
-    },
-    {
-      'imagePath': 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Prawn_cocktail.jpg',
-      'name': 'Garden Salad',
-      'desp': 'Chopt lettuce blend, blue cheese, grape tomatoes, romaine',
-      'selected': false,
-    },
-    {
-      'imagePath': 'https://upload.wikimedia.org/wikipedia/commons/d/d0/Veggie_platter.jpg?20170131184741',
-      'name': 'Fattoush',
-      'desp':
-          'Gluten-sensitive noodle stir-fry with shrimp, egg, citrus, peanuts, green onions.',
-      'selected': false,
-    },
-  ];
 
   void onClick(int index) {
     setState(() {
-      foodItems[index]['selected'] = !foodItems[index]['selected'];
+      // widget.foodItems[index]['selected'] = !foodItems[index]['selected'];
     });
   }
 
@@ -81,15 +56,15 @@ class _RestarantPreviousMealState extends State<RestarantPreviousMeal> {
           children: [
             const SizedBox(height: 20),
             Column(
-              children: foodItems.asMap().entries.map((entry) {
+              children: widget.foodItems.asMap().entries.map((entry) {
                 int index = entry.key;
-                Map<String, dynamic> foodItem = entry.value;
+                Food foodItem = entry.value;
 
                 return FoodCard(
-                  imgPath: foodItem['imagePath'],
-                  restaurant: '',
-                  dishName: foodItem['name'],
-                  description: foodItem['desp'],
+                  imgPath: foodItem.imageUrl,
+                  restaurant: foodItem.restaurantName,
+                  dishName: foodItem.title,
+                  description: foodItem.ingredients.toString(),
                   attachment: Row(
                     children: [
                       IconButton(

@@ -16,6 +16,7 @@ class _SignupScreenState extends State<ShelterSignupScreen> {
   final _formGlobalKey = GlobalKey<FormState>();
 
   final FirebaseAuthService _auth = FirebaseAuthService();
+  final UserHelper _helper = UserHelper();
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -52,7 +53,7 @@ class _SignupScreenState extends State<ShelterSignupScreen> {
   }
 
   void _signUp() async {
-    // String shelterName = _nameController.text;
+    String name = _nameController.text;
     String email = _emailController.text;
     String password = _passwordController.text;
 
@@ -61,6 +62,7 @@ class _SignupScreenState extends State<ShelterSignupScreen> {
     if (user != null && mounted && _formGlobalKey.currentState!.validate()) {
       showToast(message: 'User is successfully created');
       _formGlobalKey.currentState!.reset();
+      _helper.saveRestaurantUser(user, name);
       Navigator.pushNamed(context, '/shelter_main_page');
     } 
   }

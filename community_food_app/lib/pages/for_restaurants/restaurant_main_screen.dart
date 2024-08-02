@@ -1,4 +1,6 @@
+import 'package:community_food_app/models/category_list_data.dart';
 import 'package:community_food_app/models/dummy_data.dart';
+import 'package:community_food_app/pages/for_restaurants/restaurant_previous_meals.dart';
 import 'package:flutter/material.dart';
 
 class RestarantMainScreen extends StatefulWidget {
@@ -9,6 +11,22 @@ class RestarantMainScreen extends StatefulWidget {
 }
 
 class _RestarantMainScreenState extends State<RestarantMainScreen> {
+  void onSelectCategory(BuildContext context, CategoryItem category) {
+    final foodItems = dummyMeals
+        .where(
+          (meal) => meal.categories.contains(
+            category.label.toLowerCase(),
+          ),
+        )
+        .toList();
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => RestarantPreviousMeal(foodItems: foodItems),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -36,7 +54,7 @@ class _RestarantMainScreenState extends State<RestarantMainScreen> {
                 final categoryItem = categories[index];
                 return InkWell(
                   onTap: () {
-                    Navigator.pushNamed(context, '/restaurant_previous_meal_page');
+                    onSelectCategory(context, categoryItem);
                   },
                   child: Card(
                     elevation: 10,

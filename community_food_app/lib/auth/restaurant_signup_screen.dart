@@ -16,6 +16,7 @@ class _RestaurantSignupScreenState extends State<RestaurantSignupScreen> {
   final _formGlobalKey = GlobalKey<FormState>();
 
   final FirebaseAuthService _auth = FirebaseAuthService();
+  final UserHelper _helper = UserHelper();
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -52,7 +53,7 @@ class _RestaurantSignupScreenState extends State<RestaurantSignupScreen> {
   }
 
   void _signUp() async {
-    // String shelterName = _nameController.text;
+    String name = _nameController.text;
     String email = _emailController.text;
     String password = _passwordController.text;
 
@@ -61,8 +62,9 @@ class _RestaurantSignupScreenState extends State<RestaurantSignupScreen> {
     if (user != null && mounted && _formGlobalKey.currentState!.validate()) {
       showToast(message: 'User is successfully created');
       _formGlobalKey.currentState!.reset();
+      _helper.saveRestaurantUser(user,name);
       Navigator.pushNamed(context, '/restaurant_main_page');
-    } 
+    }
   }
 
   @override
