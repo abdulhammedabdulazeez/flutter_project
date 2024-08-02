@@ -4,6 +4,8 @@ import 'package:community_food_app/toast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:community_food_app/button_component.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class RestaurantSignupScreen extends StatefulWidget {
   const RestaurantSignupScreen({super.key});
@@ -16,6 +18,7 @@ class _RestaurantSignupScreenState extends State<RestaurantSignupScreen> {
   final _formGlobalKey = GlobalKey<FormState>();
 
   final FirebaseAuthService _auth = FirebaseAuthService();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final UserHelper _helper = UserHelper();
 
   final TextEditingController _nameController = TextEditingController();
@@ -64,6 +67,32 @@ class _RestaurantSignupScreenState extends State<RestaurantSignupScreen> {
       _formGlobalKey.currentState!.reset();
       _helper.saveRestaurantUser(user,name);
       Navigator.pushNamed(context, '/restaurant_main_page');
+    }
+  }
+
+  _signInWithGoogle() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+
+    try {
+      final GoogleSignInAccount? googleSignInAccount =
+          await googleSignIn.signIn();
+
+      if (googleSignInAccount != null) {
+        final GoogleSignInAuthentication googleSignInAuthentication =
+            await googleSignInAccount.authentication;
+
+        final AuthCredential credential = GoogleAuthProvider.credential(
+            idToken: googleSignInAuthentication.idToken,
+            accessToken: googleSignInAuthentication.accessToken);
+
+        await _firebaseAuth.signInWithCredential(credential);
+        if (mounted) {
+          Navigator.pushNamed(context, '/restaurant_main_page');
+        }
+
+      }
+    } catch (e) {
+      showToast(message: 'Some error occured: $e');
     }
   }
 
@@ -131,6 +160,32 @@ class _RestaurantSignupScreenState extends State<RestaurantSignupScreen> {
                   onTap: _signUp,
                   textColor: 'black',
                 ),
+                const SizedBox(
+                  height: 30,
+                ),
+                const Text(
+                  'OR',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold
+                  ),
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 15),
+                    elevation: 10,
+                    foregroundColor: const Color.fromARGB(255, 22, 74, 42),
+                  ),
+                  icon: Icon(MdiIcons.google),
+                  label: const Text('SignUp with Google'),
+                  onPressed: () {
+                    _signInWithGoogle();
+                  },
+                )
               ],
             ),
           ),

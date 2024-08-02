@@ -1,11 +1,7 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:community_food_app/models/category_list_data.dart';
 import 'package:community_food_app/models/dummy_data.dart';
-import 'package:community_food_app/models/food.dart';
 import 'package:community_food_app/pages/for_shelter_homes/shelter_available_foods.dart';
-import 'package:community_food_app/providers/all_meals_fetching_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ShelterMainScreen extends StatefulWidget {
   const ShelterMainScreen({super.key});
@@ -18,10 +14,6 @@ class _ShelterMainScreenState extends State<ShelterMainScreen> {
 
   
   void onSelectCategory(BuildContext context, CategoryItem category) {
-    // final filteredFood = dummyMeals
-    //     .where((item) => item.categories.contains(category.label.toLowerCase()))
-    //     .toList();
-
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) => AvailableFoods(

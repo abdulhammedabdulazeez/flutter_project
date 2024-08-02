@@ -88,10 +88,9 @@ class _ShelterLoginPageState extends State<ShelterLoginPage> {
 
   _signInWithGoogle() async {
     final GoogleSignIn googleSignIn = GoogleSignIn();
-
+    
     try {
-      final GoogleSignInAccount? googleSignInAccount =
-          await googleSignIn.signIn();
+      final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
 
       if (googleSignInAccount != null) {
         final GoogleSignInAuthentication googleSignInAuthentication =
@@ -101,16 +100,35 @@ class _ShelterLoginPageState extends State<ShelterLoginPage> {
             idToken: googleSignInAuthentication.idToken,
             accessToken: googleSignInAuthentication.accessToken);
 
-        await _firebaseAuth.signInWithCredential(credential);
-        if (mounted) {
-          Navigator.pushNamed(context, '/shelter_main_page');
-        }
+        // Sign in to Firebase with the credential
+        final UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
+        final User? user = userCredential.user;
 
+        if (user != null) {
+          // Fetch user role from Firestore
+          DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection("users").doc(user.uid).get();
+          
+          if (userDoc.exists) {
+            String userRole = userDoc.get("role"); // Assuming role is stored in the document
+
+            // Navigate based on user role
+            if (userRole == "Shelter" && mounted) {
+              Navigator.pushNamed(context, '/shelter_main_page');
+            } else if (userRole == "Restaurant" && mounted) {
+              Navigator.pushNamed(context, '/restaurant_main_page');
+            } else {
+              showToast(message: 'Unknown user role');
+            }
+          } else {
+            showToast(message: 'User data not found');
+          }
+        }
       }
     } catch (e) {
-      showToast(message: 'Some error occured: $e');
+      showToast(message: 'Some error occurred: $e');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -200,7 +218,7 @@ class _ShelterLoginPageState extends State<ShelterLoginPage> {
                     padding: const EdgeInsets.symmetric(
                         vertical: 10, horizontal: 15),
                     elevation: 10,
-                    foregroundColor: Color.fromARGB(255, 22, 74, 42),
+                    foregroundColor: const Color.fromARGB(255, 22, 74, 42),
                   ),
                   icon: Icon(MdiIcons.google),
                   label: const Text('Sign In with Google'),
